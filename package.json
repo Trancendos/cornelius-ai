@@ -18,7 +18,7 @@
     "security:cve": "node scripts/security/cve-check.mjs",
     "security:nminusone": "node scripts/security/nminusone-check.mjs",
     "security:all": "pnpm run security:policy && pnpm run security:cve && pnpm run security:nminusone",
-    "security:sbom": "pnpm dlx @cyclonedx/cyclonedx-npm --output-file sbom.cdx.json --output-format JSON",
+    "security:sbom": "pnpm dlx @cyclonedx/cdxgen -t npm -o sbom.cdx.json",
     "governance:audit": "node scripts/governance/audit-repositories.mjs --owner Trancendos --output docs/reports/repository-security-audit.json",
     "governance:regulatory": "node scripts/governance/regulatory-readiness-check.mjs --report docs/reports/repository-security-audit.json --output docs/regulatory-readiness-status.md",
     "governance:gap-analysis": "node scripts/governance/generate-final-gap-analysis.mjs --owner Trancendos --report docs/reports/repository-security-audit.json --output docs/final-gap-analysis.md",
