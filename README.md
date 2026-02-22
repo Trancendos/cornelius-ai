@@ -58,6 +58,9 @@ pnpm run governance:gap-analysis
 
 # Initiate remediation backlog creation (dry-run by default)
 pnpm run governance:initiate
+
+# Execute remediation issue creation across repos
+node scripts/governance/initiate-remediation.mjs --owner Trancendos --report docs/reports/repository-security-audit.json --output docs/remediation-initiation-summary.md --execute
 ```
 
 By default this writes a JSON report to:

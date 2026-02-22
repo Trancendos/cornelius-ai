@@ -3,6 +3,8 @@
 Generated: 2026-02-22  
 Method: live GitHub API audit (`scripts/governance/audit-repositories.mjs --owner Trancendos`)
 
+> Superseded by `docs/final-gap-analysis.md` for the latest portfolio state and readiness scoring.
+
 ## 1) Scope reviewed
 
 - Owner scanned: `Trancendos`
