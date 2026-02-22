@@ -1,0 +1,32 @@
+name: governance-audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit-repositories:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run cross-repository governance audit
+        run: node scripts/governance/audit-repositories.mjs --owner Trancendos --output docs/reports/repository-security-audit.json
+
+      - name: Upload governance report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-security-audit
+          path: docs/reports/repository-security-audit.json
