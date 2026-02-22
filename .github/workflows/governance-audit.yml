@@ -1,0 +1,45 @@
+name: governance-audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit-repositories:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run cross-repository governance audit
+        run: node scripts/governance/audit-repositories.mjs --owner Trancendos --output docs/reports/repository-security-audit.json
+
+      - name: Generate final gap analysis
+        run: node scripts/governance/generate-final-gap-analysis.mjs --owner Trancendos --report docs/reports/repository-security-audit.json --output docs/final-gap-analysis.md
+
+      - name: Generate regulatory readiness status
+        run: node scripts/governance/regulatory-readiness-check.mjs --report docs/reports/repository-security-audit.json --output docs/regulatory-readiness-status.md
+
+      - name: Preview remediation initiation (dry-run)
+        run: node scripts/governance/initiate-remediation.mjs --owner Trancendos --report docs/reports/repository-security-audit.json --output docs/remediation-initiation-summary.md
+
+      - name: Upload governance report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-security-audit
+          path: |
+            docs/reports/repository-security-audit.json
+            docs/final-gap-analysis.md
+            docs/regulatory-readiness-status.md
+            docs/remediation-initiation-summary.md
