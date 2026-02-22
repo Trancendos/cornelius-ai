@@ -2,4 +2,6 @@ node_modules/
 dist/
 coverage/
 docs/reports/*.json
+sbom.cdx.json
+results.sarif
 *.log

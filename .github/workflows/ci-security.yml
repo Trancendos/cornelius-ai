@@ -57,6 +57,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Enforce policy baseline
+        run: pnpm run security:policy
+
       - name: Enforce N-0/N-1 policy
         run: pnpm run security:nminusone
 

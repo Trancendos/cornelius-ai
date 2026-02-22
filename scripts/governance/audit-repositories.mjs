@@ -125,9 +125,29 @@ for (const repo of repos) {
     /(security|vulnerability|sast|cve|audit)/i.test(path),
   );
   const hasCiWorkflow = workflowFiles.some((path) => /(ci|build|test)/i.test(path));
+  const hasSbomWorkflow = workflowFiles.some((path) => /(sbom|cyclonedx|bom)/i.test(path));
+  const hasSecretScanWorkflow = workflowFiles.some((path) =>
+    /(secret|gitleaks|trufflehog|detect-secrets)/i.test(path),
+  );
+  const hasScorecardWorkflow = workflowFiles.some((path) => /scorecard/i.test(path));
 
   const hasCanonicalTemplate = canonicalTemplateFiles.every((path) => fileSet.has(path));
   const isTemplateLike = hasCanonicalTemplate && files.length <= 10;
+  const controls = {
+    dependabot: hasDependabot,
+    securityPolicy: hasSecurityMd,
+    ciWorkflow: hasCiWorkflow,
+    securityWorkflow: hasSecurityWorkflow,
+    codeqlWorkflow: hasCodeqlWorkflow,
+    sbomWorkflow: hasSbomWorkflow,
+    secretScanWorkflow: hasSecretScanWorkflow,
+    scorecardWorkflow: hasScorecardWorkflow,
+    installableDependencyModel: !hasWorkspaceSharedCore,
+  };
+  const controlScore = Object.values(controls).filter(Boolean).length;
+  const controlTotal = Object.keys(controls).length;
+  const compliancePercent = Number(((controlScore / controlTotal) * 100).toFixed(2));
+  const productionReady = controlScore === controlTotal;
 
   records.push({
     repo: repo.name,
@@ -142,7 +162,15 @@ for (const repo of repos) {
     hasCodeqlWorkflow,
     hasSecurityWorkflow,
     hasCiWorkflow,
+    hasSbomWorkflow,
+    hasSecretScanWorkflow,
+    hasScorecardWorkflow,
     hasWorkspaceSharedCore,
+    controls,
+    controlScore,
+    controlTotal,
+    compliancePercent,
+    productionReady,
     isTemplateLike,
     workflowFiles,
   });
@@ -163,7 +191,11 @@ const summary = {
   missingCodeqlWorkflow: validRecords.filter((item) => !item.hasCodeqlWorkflow).length,
   missingSecurityWorkflow: validRecords.filter((item) => !item.hasSecurityWorkflow).length,
   missingCiWorkflow: validRecords.filter((item) => !item.hasCiWorkflow).length,
+  missingSbomWorkflow: validRecords.filter((item) => !item.hasSbomWorkflow).length,
+  missingSecretScanWorkflow: validRecords.filter((item) => !item.hasSecretScanWorkflow).length,
+  missingScorecardWorkflow: validRecords.filter((item) => !item.hasScorecardWorkflow).length,
   workspaceSharedCorePattern: validRecords.filter((item) => item.hasWorkspaceSharedCore).length,
+  productionReadyRepos: validRecords.filter((item) => item.productionReady).length,
 };
 
 const gaps = {
@@ -172,10 +204,18 @@ const gaps = {
   missingCodeqlWorkflow: validRecords.filter((item) => !item.hasCodeqlWorkflow).map((item) => item.repo),
   missingSecurityWorkflow: validRecords.filter((item) => !item.hasSecurityWorkflow).map((item) => item.repo),
   missingCiWorkflow: validRecords.filter((item) => !item.hasCiWorkflow).map((item) => item.repo),
+  missingSbomWorkflow: validRecords.filter((item) => !item.hasSbomWorkflow).map((item) => item.repo),
+  missingSecretScanWorkflow: validRecords
+    .filter((item) => !item.hasSecretScanWorkflow)
+    .map((item) => item.repo),
+  missingScorecardWorkflow: validRecords
+    .filter((item) => !item.hasScorecardWorkflow)
+    .map((item) => item.repo),
   workspaceSharedCorePattern: validRecords
     .filter((item) => item.hasWorkspaceSharedCore)
     .map((item) => item.repo),
   templateLikeRepos: validRecords.filter((item) => item.isTemplateLike).map((item) => item.repo),
+  productionReadyRepos: validRecords.filter((item) => item.productionReady).map((item) => item.repo),
 };
 
 const report = { summary, gaps, records };

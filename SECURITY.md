@@ -29,3 +29,6 @@ We will triage, mitigate, and publish fixes according to severity.
 - CodeQL static analysis.
 - Scheduled CVE audit gate (`high` and `critical` vulnerabilities fail checks).
 - N-0/N-1 dependency compliance check.
+- SBOM generation for software supply-chain visibility.
+- Automated secret scanning.
+- OSSF scorecard supply-chain posture checks.
